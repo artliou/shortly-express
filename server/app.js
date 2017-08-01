@@ -21,7 +21,7 @@ app.get('/',
 (req, res) => {
   res.render('index');
 });
-
+ 
 app.get('/create', 
 (req, res) => {
   res.render('index');
@@ -78,8 +78,37 @@ app.post('/links',
 // Write your authentication routes here
 /************************************************************/
 
-
-
+app.post('/signup', (req, res, next) => {
+  // Destructing when putting key/value pairs in create
+  var name = req.body.username;
+  return models.Users.get({ username: name })
+    .then(user => {
+      if (user) {
+        var headers = {
+          location: '/signup'
+        };
+        res.writeHeader(500, headers);
+        // res.redirect(500, '/signup');
+        res.end();
+      } else {
+        return models.Users.create({ username: req.body.username, password: req.body.password})
+        .then(results => {
+          return models.Users.get({username: req.body.username});
+        })
+        .then(username => {
+          var name = username.username;
+          // throw name;
+          res.redirect('/');
+          res.status(201).send(name);
+        // })
+        // .then(name => {
+        })
+        .catch(error => {
+          res.status(500).send(error);
+        });
+      }  
+    });
+});
 /************************************************************/
 // Handle the code parameter route last - if all other routes fail
 // assume the route is a short code and try and handle it here.

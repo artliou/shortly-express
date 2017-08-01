@@ -456,6 +456,7 @@ describe('', function() {
               requestWithCookies.cookies.shortlyid = hash;
 
               createSession(requestWithCookies, secondResponse, function() {
+                // console.log(requestWithCookies.cookies, 'testing');
                 var session = requestWithCookies.session;
                 expect(session).to.be.an('object');
                 expect(session.user.username).to.eq(username);

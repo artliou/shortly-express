@@ -13,8 +13,7 @@ const parseCookies = (req, res, next) => {
       req.cookies.anotherCookie = cookie[2].slice(14).toString();
     }
   }
-  // 
-  
+
   //console.log(req.cookies, 'Here!');  
   res.statusCode = 201;
   res.end();

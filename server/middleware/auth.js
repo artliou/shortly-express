@@ -2,16 +2,40 @@ const models = require('../models');
 const Promise = require('bluebird');
 
 module.exports.createSession = (req, res, next) => {
-  //if no req.cookies
-  if (req.headers.cookie) {
+  
+  if (req.headers.cookies) {
+    // return models.Users.get()
+    //   .then(results => {
+    //     console.log(results, 'results');
+    //     req.session = {
+    //       user: {
+    //         username: results.username
+    //       }
+    //     };
+    //       // console.log(req.session);
+    //     res.status(201);
+    console.log('divert');
     res.end();
+    next();
+      // });
   } else {
     return models.Sessions.create()
       .then( data => {
-        return models.Sessions.get( {hash: data.hash} );
+        // console.log('this?', data);
+        return models.Sessions.get({id: data.insertId});
       })
-      .then( hash => {
-        console.log(hash);
+      .then( results => {
+        req.session = {
+          userId: results.id,
+          hash: results.hash
+        };
+        return req.session;
+      })
+      .then( (session) => {
+        res.cookies = {
+          'shortlyid': { value: session.hash }
+        };
+        // console.log(res.cookies);
         res.status(201);
         res.end();
         next();
@@ -19,16 +43,6 @@ module.exports.createSession = (req, res, next) => {
       .catch(err => {
         res.status(500).send(err);
       });
-    //create a session
-    
-    // req needs session key, session is obj, hash is in obj
-    // expect
-    // var session = {
-    //   session: "hash"
-    // };
-    res.statusCode = 200;
-    res.end();
-    next();
   }
 };
 

@@ -3,47 +3,31 @@ const Promise = require('bluebird');
 
 module.exports.createSession = (req, res, next) => {
   
-  if (req.headers.cookies) {
-    // return models.Users.get()
-    //   .then(results => {
-    //     console.log(results, 'results');
-    //     req.session = {
-    //       user: {
-    //         username: results.username
-    //       }
-    //     };
-    //       // console.log(req.session);
-    //     res.status(201);
-    console.log('divert');
-    res.end();
-    next();
-      // });
-  } else {
-    return models.Sessions.create()
-      .then( data => {
-        // console.log('this?', data);
+  Promise.resolve(req.cookies.shortlyid) 
+    .then(hash => {
+      if (!hash) {
+        throw hash;
+      }
+      return models.Sessions.get({hash});
+    })
+    .tap(session => {
+      if (!session) {
+        throw session;
+      }
+    })
+   .catch(() => {
+     return models.Sessions.create()
+      .then(data => {
         return models.Sessions.get({id: data.insertId});
       })
-      .then( results => {
-        req.session = {
-          userId: results.id,
-          hash: results.hash
-        };
-        return req.session;
-      })
-      .then( (session) => {
-        res.cookies = {
-          'shortlyid': { value: session.hash }
-        };
-        // console.log(res.cookies);
-        res.status(201);
-        res.end();
-        next();
-      })
-      .catch(err => {
-        res.status(500).send(err);
+      .tap(session => {
+        res.cookie('shortlyid', session.hash);
       });
-  }
+   })
+   .then(session => {
+     req.session = session;
+     next();
+   }); 
 };
 
 /************************************************************/

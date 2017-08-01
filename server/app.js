@@ -14,7 +14,8 @@ app.use(partials());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
-
+app.use(require('./middleware/cookieParser'));
+app.use(Auth.createSession);
 
 
 app.get('/', 
@@ -81,6 +82,7 @@ app.post('/links',
 app.post('/signup', (req, res, next) => {
   // Destructing when putting key/value pairs in create
   var name = req.body.username;
+  var password = req.body.password;
   return models.Users.get({ username: name })
     .then(user => {
       if (user) {

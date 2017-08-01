@@ -84,11 +84,11 @@ app.post('/signup', (req, res, next) => {
   return models.Users.get({ username: name })
     .then(user => {
       if (user) {
-        var headers = {
-          location: '/signup'
-        };
-        res.writeHeader(500, headers);
-        // res.redirect(500, '/signup');
+        // var headers = {
+        //   location: '/signup'
+        // };
+        //res.writeHeader(500, headers);
+        res.redirect(500, '/signup');
         res.end();
       } else {
         return models.Users.create({ username: req.body.username, password: req.body.password})
@@ -98,14 +98,30 @@ app.post('/signup', (req, res, next) => {
         .then(username => {
           var name = username.username;
           // throw name;
-          res.redirect('/');
-          res.status(201).send(name);
+          res.redirect(201, '/');
+          res.end(name);
         // })
         // .then(name => {
         })
         .catch(error => {
           res.status(500).send(error);
         });
+      }  
+    });
+});
+
+app.post('/login', (req, res, next) => {
+  var name = req.body.username;
+  var pass = req.body.password;
+  return models.Users.get({ username: name })
+    .then(user => {
+      if (user && models.Users.compare(pass, user.password, user.salt)) {
+        //console.log('compare', models.Users.compare(pass, user.password, user.salt));
+        res.redirect(201, '/');
+        res.end();
+      } else if (!user || models.Users.compare(pass, user.password, user.salt) === false) {
+        res.redirect(201, '/login');
+        res.end();
       }  
     });
 });

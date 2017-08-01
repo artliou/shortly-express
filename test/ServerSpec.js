@@ -64,7 +64,7 @@ describe('', function() {
   describe('Database Schema:', function() {
     it('contains a users table', function(done) {
       var queryString = 'SELECT * FROM users';
-      console.log('check');
+      // console.log('check');
       db.query(queryString, function(err, results) {
         if (err) { return done(err); }
 
@@ -186,7 +186,7 @@ describe('', function() {
         if (error) { return done(error); }
         request(options, function(err, response, resBody) {
           if (err) { return done(err); }
-          console.log(response.headers);
+          // console.log(response.headers);
           expect(response.headers.location).to.equal('/signup');
           done();
         });
@@ -200,7 +200,7 @@ describe('', function() {
         'json': {
           'username': 'Samantha',
           'password': 'Samantha'
-        }
+        }  
       };
 
       request(options, function(error, res, body) {
